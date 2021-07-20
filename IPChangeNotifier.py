@@ -36,7 +36,7 @@ class REPORT_CONSTANT(object):
     }
 
     EVENT_ID = {
-        58701 : [win32evtlog.EVENTLOG_INFORMATION_TYPE, ["Initialize new email sender process",""]],
+        58701 : [win32evtlog.EVENTLOG_INFORMATION_TYPE, ["Initialize new email sender process"]],
         58702 : [win32evtlog.EVENTLOG_INFORMATION_TYPE, ["Transport success"]],
         58703 : [win32evtlog.EVENTLOG_ERROR_TYPE, ["Connection disabled"]],
         58704 : [win32evtlog.EVENTLOG_WARNING_TYPE, ["Configuration changed"]],
@@ -91,7 +91,7 @@ class SecureMailSender(object):
     def send_mail(sender, receiver, subject, body):
         credential = json.loads(sender)
         if(credential["mac"]!=SecureMailSender.generateHostID()):
-            return (False, None)
+            return (False, -1)
         try:
             smtp = smtplib.SMTP(credential["server"], credential["port"])
             smtp.ehlo()
@@ -163,7 +163,6 @@ class IpNotifier(Process):
 
         self.__CONFIG = None
         self.__read_config()
-        self.__logger = None
         self.__opcode = opcode
         self.__logger = EventLogger("IpNotifier", self.__opcode)
         
@@ -171,6 +170,10 @@ class IpNotifier(Process):
             "#{ip}" : "127.0.0.1",
             "#{time}" : time.ctime()
         }
+
+    def __del__(self):
+        del self.__logger
+        # Sth to clear
 
     def __read_config(self):
         master =  os.path.dirname(__file__) + os.sep + "config.conf"
@@ -262,11 +265,11 @@ class IpNotifier(Process):
                     self.__logger.log_write(58702, "")
             time.sleep(self.__CONFIG["TIME_DELTA"])
 
-        self.__logger.log_write(58705, "")
-
     def run(self):
+        self.__logger.log_write(58701, "")
         self.register()
         self.begin()
+        self.__logger.log_write(58705, "")
 
 if __name__ == "__main__":
     def signal_handler(signal, frame):
@@ -274,7 +277,5 @@ if __name__ == "__main__":
     signal.signal(signal.SIGINT, signal_handler)
 
     iNot = IpNotifier(True)
-    iNot.register()
-    iNot.begin()
-
+    iNot.run()
     sys.exit(0)
