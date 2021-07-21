@@ -67,7 +67,7 @@ class SecureMailSender(object):
         return win32crypt.CryptProtectData(SecureMailSender.randstring(text).encode('utf-8'), None, None, None, None, 0)
 
     @staticmethod
-    def generateHostID():
+    def generate_host_id():
         c = wmi.WMI()
         seed = "{0}{1}".format(c.Win32_Processor()[0].ProcessorId, c.Win32_DiskDrive()[0].SerialNumber)
         return hashlib.sha256(seed.encode()).hexdigest()
@@ -87,7 +87,7 @@ class SecureMailSender(object):
     @staticmethod
     def send_mail(sender, receiver, subject, body):
         credential = json.loads(sender)
-        if(credential["mac"]!=SecureMailSender.generateHostID()):
+        if(credential["mac"]!=SecureMailSender.generate_host_id()):
             return (False, -1)
         try:
             smtp = smtplib.SMTP(credential["server"], credential["port"])
@@ -110,7 +110,7 @@ class SecureMailSender(object):
         credential = json.loads(sender)
         recv_accnt = json.loads(receiver)
 
-        if(credential["mac"]!=SecureMailSender.generateHostID()):
+        if(credential["mac"]!=SecureMailSender.generate_host_id()):
             return (False, -1)
 
         try:
@@ -211,7 +211,7 @@ class IpChangeNotifier(Process):
     def register(self):
         if(os.path.exists(self.__CONFIG["SENDER_INFO_PATH"]) == False):
             sender_info = dict.fromkeys(['mac','server','email','key','port'])
-            sender_info.update({"mac": str(SecureMailSender.generateHostID()).strip()})
+            sender_info.update({"mac": str(SecureMailSender.generate_host_id()).strip()})
             sender_info.update({"email": str(input("Enter your email account:\n")).strip()})
             sender_info.update({"key": str(input("Enter your app key to login your email account:\n")).strip()})
             sender_info.update({"server": str(input("Enter your SMTP server:\n"))})
