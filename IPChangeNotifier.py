@@ -267,17 +267,20 @@ class IpChangeNotifier(Process):
                     self.__logger.log_write(58702)
             time.sleep(self.__CONFIG["TIME_DELTA"])
 
-    def run(self):
+    def loop(self):
         self.__logger.log_write(58701)
         self.register()
         self.begin()
         self.__logger.log_write(58705)
 
+    def run(self):
+        self.register()
+        
 if __name__ == "__main__":
     def signal_handler(signal, frame):
         sys.exit(0)
     signal.signal(signal.SIGINT, signal_handler)
 
     iNot = IpChangeNotifier(True)
-    iNot.run()
+    iNot.loop()
     sys.exit(0)
