@@ -1,6 +1,3 @@
-# python -m pip install pypiwin32
-# python -m pip install wim
-
 from win32 import win32crypt
 import wmi
 
