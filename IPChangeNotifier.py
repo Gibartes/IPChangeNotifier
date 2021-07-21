@@ -164,7 +164,7 @@ class IpNotifier(Process):
         self.__CONFIG = None
         self.__read_config()
         self.__opcode = opcode
-        self.__logger = EventLogger("IpNotifier", self.__opcode)
+        self.__logger = EventLogger("IPChangeNotifier", self.__opcode)
         
         self.__transTable = {
             "#{ip}" : "127.0.0.1",
