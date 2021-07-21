@@ -154,19 +154,19 @@ class EventLogger(object):
         else:
             self.__report(eventID, msg)
 
-class IpNotifier(Process):
+class IpChangeNotifier(Process):
     def __init__(self, opcode):
         Process.__init__(self)
 
         self.__CONFIG = None
-        self.__read_config()
         self.__opcode = opcode
-        self.__logger = EventLogger("IPChangeNotifier", self.__opcode)
+        self.__logger = EventLogger(self.__class__.__name__, self.__opcode)
         
         self.__transTable = {
             "#{ip}" : "127.0.0.1",
             "#{time}" : time.ctime()
         }
+        self.__read_config()
 
     def __del__(self):
         del self.__logger
@@ -273,6 +273,6 @@ if __name__ == "__main__":
         sys.exit(0)
     signal.signal(signal.SIGINT, signal_handler)
 
-    iNot = IpNotifier(True)
+    iNot = IpChangeNotifier(True)
     iNot.run()
     sys.exit(0)
