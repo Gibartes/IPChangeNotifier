@@ -9,4 +9,4 @@ This program is currently only available on Windows. It uses the third party pyt
 - requests
 
 ## How to use it
-First, run the python script to register new sender and listener. Then register the script with the task scheduler to start automatically at boot time. If you get some errors, look for event logs with the event code 587XX.
+First, run the python script to register new sender and listener. Then register the script with the task scheduler to start automatically at boot time. If you get some errors, look for event logs with the event code 587XX. You can edit the title and content of a mail by modifying the "config.conf" file.
