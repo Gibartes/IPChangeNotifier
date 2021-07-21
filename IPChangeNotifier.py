@@ -32,7 +32,7 @@ class REPORT_CONSTANT(object):
         "TARGET_INFO_PATH" : "{0}".format(os.path.dirname(__file__) + os.sep + "admin.bin"),
         "TIME_DELTA": 300,
         "TITLE"  :   "[Report] Your ip address was changed.",
-        "MESSAGE": "Your ip address was changed. Your current ip address is #{ip} at #{time}"
+        "MESSAGE": "Your ip address was changed. Your current ip address is #{ip} at #{time}."
     }
 
     EVENT_ID = {
@@ -146,7 +146,7 @@ class EventLogger(object):
                                     eventType = REPORT_CONSTANT.EVENT_ID.get(eventID, 58799)[0], 
                                     strings = message, data = "Application\0Data".encode("ascii"), sid = self.__sid)
     
-    def log_write(self, eventID, message):
+    def log_write(self, eventID, message = ""):
         msg = REPORT_CONSTANT.EVENT_ID.get(eventID, 58799)[1]
         if(type(message)==str):
             msg += [message]
@@ -250,8 +250,8 @@ class IpNotifier(Process):
                 
                 current = ip[1]
                 self.__update_table(ip[1])
-                title  = pattern.sub(lambda match: self.__transTable[match.group(0)], self.__CONFIG["TITLE"])
-                body   = pattern.sub(lambda match: self.__transTable[match.group(0)], self.__CONFIG["MESSAGE"])
+                title = pattern.sub(lambda match: self.__transTable[match.group(0)], self.__CONFIG["TITLE"])
+                body  = pattern.sub(lambda match: self.__transTable[match.group(0)], self.__CONFIG["MESSAGE"])
                 r, e  = SecureMailSender.send_mail_s(sender, receiver, title, body)
                 if(r == False and e == -1):
                     message = "[!] Credentials are corrupted."
@@ -262,14 +262,14 @@ class IpNotifier(Process):
                     message = "[!] An error has occurred: {0}".format(e)
                     self.__logger.log_write(58799, message)
                 else:
-                    self.__logger.log_write(58702, "")
+                    self.__logger.log_write(58702)
             time.sleep(self.__CONFIG["TIME_DELTA"])
 
     def run(self):
-        self.__logger.log_write(58701, "")
+        self.__logger.log_write(58701)
         self.register()
         self.begin()
-        self.__logger.log_write(58705, "")
+        self.__logger.log_write(58705)
 
 if __name__ == "__main__":
     def signal_handler(signal, frame):
