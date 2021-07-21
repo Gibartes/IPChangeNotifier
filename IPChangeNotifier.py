@@ -21,6 +21,9 @@ from multiprocessing import Process
 
 
 class REPORT_CONSTANT(object):
+    
+    CONFIG_FILE_PATH = os.path.dirname(__file__) + os.sep + "config.conf"
+
     CONFIGURATION = {
         "IP_ADDR_PROVIDER": "http://jsonip.com",
         "IP_ADDR_PROVIDER_RESPONSE_TYPE" : "json",
@@ -173,14 +176,13 @@ class IpChangeNotifier(Process):
         # Sth to clear
 
     def __read_config(self):
-        master =  os.path.dirname(__file__) + os.sep + "config.conf"
         self.__CONFIG = copy.deepcopy(REPORT_CONSTANT.CONFIGURATION)
-        if(os.path.exists(master)==False):
-            with open(master, "w") as file:
+        if(os.path.exists(REPORT_CONSTANT.CONFIG_FILE_PATH)==False):
+            with open(REPORT_CONSTANT.CONFIG_FILE_PATH, "w") as file:
                 file.write(json.dumps(REPORT_CONSTANT.CONFIGURATION, indent=4))
             return
         try:
-            with open(master, "r") as file:
+            with open(REPORT_CONSTANT.CONFIG_FILE_PATH, "r") as file:
                 self.__CONFIG = json.load(file)
             self.__CONFIG["TIME_DELTA"] = int(self.__CONFIG["TIME_DELTA"])
             if(self.__CONFIG["TIME_DELTA"] < 60):
@@ -212,17 +214,18 @@ class IpChangeNotifier(Process):
         if(os.path.exists(self.__CONFIG["SENDER_INFO_PATH"]) == False):
             sender_info = dict.fromkeys(['mac','server','email','key','port'])
             sender_info.update({"mac": str(SecureMailSender.generate_host_id()).strip()})
-            sender_info.update({"email": str(input("Enter your email account:\n")).strip()})
-            sender_info.update({"key": str(input("Enter your app key to login your email account:\n")).strip()})
-            sender_info.update({"server": str(input("Enter your SMTP server:\n"))})
-            u = str(input("Enter SMTP server port:\n")).strip()
+            sender_info.update({"email": str(input("[1] Enter your email account:\n")).strip()})
+            sender_info.update({"key": str(input("[2] Enter your app key to login your email account:\n")).strip()})
+            sender_info.update({"server": str(input("[3] Enter your SMTP server:\n"))})
+            u = str(input("[4] Enter SMTP server port:\n")).strip()
             sender_info.update({"port": int(u) if u.isdigit() and int(u) in range(1, 65536) else 587})
             SecureMailSender.encrypt_credential(self.__CONFIG["SENDER_INFO_PATH"], 
                 SecureMailSender.build_credential_to_json(sender_info))
             self.__logger.log_write(58704, "New sender is registered.")
+            print("[*] If you want to edit title and content, modify the config.conf file.")
         if(os.path.exists(self.__CONFIG["TARGET_INFO_PATH"]) == False):
             recv_info = dict.fromkeys(['mac','server','email','key','port'], ''.join(random.SystemRandom().choice(string.ascii_uppercase + string.digits) for _ in range(SecureMailSender.SALT_LENGTH)))
-            recv_info.update({"email": str(input("Enter listener's email account:\n")).strip()})
+            recv_info.update({"email": str(input("[1] Enter listener's email account:\n")).strip()})
             SecureMailSender.encrypt_credential(self.__CONFIG["TARGET_INFO_PATH"], 
                 SecureMailSender.build_credential_to_json(recv_info))
             self.__logger.log_write(58704, "New listener is registered.")
