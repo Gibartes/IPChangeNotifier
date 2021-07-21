@@ -193,9 +193,14 @@ class IpChangeNotifier(Process):
         self.__transTable.update({"#{time}": time.ctime()})
 
     def get_ip_address(self):
-        if(self.__CONFIG["IP_ADDR_PROVIDER_RESPONSE_TYPE"].lower() == "json"):
+        if(self.__CONFIG["IP_ADDR_PROVIDER_RESPONSE_TYPE"].lower() == "json"): # e.g. https://api.ipify.org?format=json or http://jsonip.com etc..
             try:
                 return (True, requests.get(self.__CONFIG["IP_ADDR_PROVIDER"]).json()[self.__CONFIG["IP_ADDR_PROVIDER_IP_ATTR_NAME"]])
+            except Exception as e:
+                return (False, e)
+        elif(self.__CONFIG["IP_ADDR_PROVIDER_RESPONSE_TYPE"].lower() == "text"): # e.g. https://api.ipify.org
+            try:
+                return (True, requests.get(self.__CONFIG["IP_ADDR_PROVIDER"]).text)
             except Exception as e:
                 return (False, e)
         return (False, 0)
