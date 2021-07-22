@@ -17,8 +17,6 @@ import string
 import os, sys, re
 import requests, smtplib 
 from email.mime.text import MIMEText
-from multiprocessing import Process
-
 
 class REPORT_CONSTANT(object):
     
@@ -132,7 +130,6 @@ class SecureMailSender(object):
         del credential
         return (True, None)
 
-
 class EventLogger(object):
     def __init__(self, name, opcode):
         ph  = win32api.GetCurrentProcess()
@@ -148,19 +145,15 @@ class EventLogger(object):
     
     def log_write(self, eventID, message = ""):
         msg = REPORT_CONSTANT.EVENT_ID.get(eventID, 58799)[1]
-        if(type(message)==str):
-            msg += [message]
-        else:
-            msg += message
+        if(len(message)>0):
+            msg += [message] if type(message)==str else message
         if(self.__opcode == False):
             print(msg)
         else:
             self.__report(eventID, msg)
 
-class IpChangeNotifier(Process):
+class IpChangeNotifier():
     def __init__(self, opcode):
-        Process.__init__(self)
-
         self.__CONFIG = None
         self.__opcode = opcode
         self.__logger = EventLogger(self.__class__.__name__, self.__opcode)
@@ -275,9 +268,6 @@ class IpChangeNotifier(Process):
         self.register()
         self.begin()
         self.__logger.log_write(58705)
-
-    def run(self):
-        self.register()
         
 if __name__ == "__main__":
     def signal_handler(signal, frame):
