@@ -232,9 +232,11 @@ class IpChangeNotifier():
         while(True):
             ip = self.get_ip_address()
             if(ip[0] == False):
-                message = "[!] IP notifier is currently unable to obtain external IP addresses from [{0}]".format(self.__CONFIG["IP_ADDR_PROVIDER"])
+                message = "[!] IP notifier is currently unable to obtain external IP addresses from [{0}]\nReason: {1}".format(self.__CONFIG["IP_ADDR_PROVIDER"], str(ip[1]))
                 self.__logger.log_write(58703, message)
-                break
+                if(ip[1]==0):
+                    break
+                time.sleep(self.__CONFIG["TIME_DELTA"])
 
             if(ip[1] != current):
                 try:
